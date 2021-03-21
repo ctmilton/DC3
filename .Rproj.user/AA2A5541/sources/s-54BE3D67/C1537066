@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1616344140680.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "C1537066",
+    "lastKnownWriteTime" : 140315751226368,
+    "last_content_update" : 1616344140680,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "D64803CD",
+        "caption" : "Sensor_Data",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=Sensor_Data&cache_key=D64803CD",
+        "displayedObservations" : 79243,
+        "environment" : "",
+        "expression" : "Sensor_Data",
+        "object" : "Sensor_Data",
+        "preview" : 0,
+        "totalObservations" : 79243,
+        "variables" : 4
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

@@ -14,6 +14,7 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = F)
+library(tidyverse)
 library(readr)
 ```
 
@@ -31,7 +32,54 @@ Sensor_Data <- read_csv("Sensor Data.csv",
 
 # Lekagul Sensor
 
-```{r}
+171,477 entries -->  1,043 car ids that does not enter and leave immediately ?
 
+```{r}
+traffic_data <- Lekagul_Sensor_Data %>%
+  mutate(in_out_n = ifelse(str_detect(`gate-name`,"entrance"),1,0)) %>%
+  group_by(`car-id`) %>%
+  mutate(in_out_check = sum(in_out_n)) %>% distinct(`car-id`, .keep_all = T) %>%
+  filter(in_out_check!=2) %>%
+  arrange(desc(in_out_check))
+```
+
+?
+
+
+# Meteorological Data
+
+```{r}
+ggplot(data = Meteorological_Data,aes(x=Date, y = `Wind Direction`)) +
+  geom_point()
+ggplot(data = Meteorological_Data,aes(x=Date, y = `Wind Speed (m/s)`)) +
+  geom_point()
+```
+
+# Sensor Data
+
+```{r}
+Sensor_Data <- Sensor_Data %>%
+  mutate(month = substr(as.character(`Date Time`), 6, 7))
+sensor_april <- Sensor_Data%>%
+  filter(month == '04')
+sensor_aug <- Sensor_Data%>%
+  filter(month == '08')
+sensor_dec <- Sensor_Data%>%
+  filter(month == '12')
+
+c1<- ggplot(data = sensor_april, aes(x=`Date Time`, y = Reading, color = Chemical)) +
+  geom_line() + labs(x=NULL, y=NULL) + theme_classic() +
+  scale_x_datetime(expand = c(0, 0),             # remove space within each panel
+                   breaks = "5 days", date_labels = "%b %d")
+c2 <- ggplot(data = sensor_aug, aes(x=`Date Time`, y = Reading, color = Chemical)) +
+  geom_line() + labs(x=NULL, y=NULL) + theme_classic() +
+  scale_x_datetime(expand = c(0, 0),
+                   breaks = "5 days", date_labels = "%b %d") +
+  scale_y_continuous(limits = c(0,100))
+c3 <- ggplot(data = sensor_dec, aes(x=`Date Time`, y = Reading, color = Chemical)) +
+  geom_line() + labs(x=NULL, y=NULL) + theme_classic()+
+  scale_x_datetime(expand = c(0, 0),             
+                   breaks = "5 days", date_labels = "%b %d")
+ggpubr::ggarrange(c1, c2, c3, nrow = 3, common.legend = TRUE, legend="bottom")
 ```
 

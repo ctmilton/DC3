@@ -1,0 +1,324 @@
+---
+title: "DC2"
+author: "Nage Ngo"
+date: "3/11/2021"
+output:   
+  html_document:
+    toc: true
+    toc_depth: 3
+    theme: cosmo
+    highlight: tango
+    toc_float: true
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = T)
+library(tidyverse)
+library(readr) 
+library(tidygraph)
+library(ggraph)
+```
+
+```{r movement}
+park_movement_Sun <- read_csv("Movement Data/park-movement-Sun.csv", 
+    col_types = cols(Timestamp = col_datetime(format = "%Y-%m-%d %H:%M:%S\t")))
+# 2014-6-08 08:00:11	
+park_movement_Sat <- read_csv("Movement Data/park-movement-Sat.csv",
+    col_types = cols(Timestamp = col_datetime(format = "%Y-%m-%D %H:%M:%S\t")))
+# 2014-6-07 08:00:08	
+park_movement_Fri <- read_csv("Movement Data/park-movement-Fri.csv",
+    col_types = cols(Timestamp = col_datetime(format = "%Y-%m-%D %H:%M:%S\t")))
+# 2014-6-06 08:00:19	
+```
+
+## Time
+
+```{r second-level visits}
+park_movement_Fri_n <- park_movement_Fri %>% group_by(Timestamp) %>%
+  mutate(n = 1, count = sum(n)) %>%
+  select(id,Timestamp,count,type) %>% distinct(Timestamp, .keep_all=T)
+park_movement_Sat_n <- park_movement_Sat %>% group_by(Timestamp) %>%
+  mutate(n = 1, count = sum(n))%>% 
+  select(Timestamp,count,type) %>% distinct(Timestamp, .keep_all=T) 
+park_movement_Sun_n <- park_movement_Sun %>%  group_by(Timestamp) %>%
+  mutate(n = 1, count = sum(n))%>% select(Timestamp,count,type) %>% distinct(Timestamp, .keep_all=T) 
+
+fri_n <- ggplot(data = park_movement_Fri_n, aes(x=Timestamp, y=count)) + geom_line()+
+  scale_x_datetime(date_breaks = "1 hour") + labs(x="Friday",y=NULL) + theme_bw() +
+  theme(axis.text.x = element_blank())
+sat_n <- ggplot() + geom_line(data = park_movement_Sat_n, aes(x=Timestamp, y=count))+
+  scale_x_datetime(date_breaks = "1 hour") + labs(x="Saturday",y=NULL) + theme_bw()+
+  theme(axis.text.x = element_blank())
+sun_v <- ggplot() + geom_line(data = park_movement_Sun_n, aes(x=Timestamp, y=count)) +
+  scale_x_datetime(date_breaks = "1 hour",date_labels = "%H:%M")+ labs(x="Sunday",y=NULL) + theme_bw()
+
+ggpubr::ggarrange(fri_n,sat_n,sun_v, nrow = 3)
+```
+
+### Time check in
+
+```{r hourly visits check in only}
+park_movement_Fri_n_check <- park_movement_Fri %>% filter(type == "check-in") %>% 
+  mutate(hour = substr(Timestamp, 12,13)) %>% group_by(hour) %>% mutate(n = 1, count = sum(n))%>%
+  distinct(hour, .keep_all=T)%>%
+  select(Timestamp,count,type)
+park_movement_Sat_n_check <- park_movement_Sat %>% filter(type == "check-in") %>%
+  mutate(hour = substr(Timestamp, 12,13)) %>% group_by(hour) %>% mutate(n = 1, count = sum(n))%>%
+  distinct(hour, .keep_all=T)%>%
+  select(Timestamp,count,type)
+park_movement_Sun_n_check <- park_movement_Sun %>% filter(type == "check-in") %>%
+  mutate(hour = substr(Timestamp, 12,13)) %>% group_by(hour) %>% mutate(n = 1, count = sum(n))%>%
+  distinct(hour, .keep_all=T)%>%
+  select(Timestamp,count,type)
+
+fri_n_c <- ggplot(data = park_movement_Fri_n_check, aes(x=as.integer(hour), y=count)) + geom_line()+
+  theme_bw() +
+  scale_x_discrete(name = "Friday",limits=c(8:23))+
+  theme(axis.text.x = element_blank(),
+        axis.ticks = element_blank()) + labs(y=NULL)
+sat_n_c <- ggplot() + geom_line(data = park_movement_Sat_n_check, aes(x=as.integer(hour), y=count))+
+  theme_bw() +
+  scale_x_discrete(name = "Saturday",limits=c(8:23)) +
+  theme(axis.text.x = element_blank(),
+        axis.ticks = element_blank())+ labs(y=NULL)
+sun_v_c <- ggplot() + geom_line(data = park_movement_Sun_n_check, aes(x=as.integer(hour), y=count))+
+  theme_bw() +
+  scale_x_discrete(name = "Sunday",limits=c(8:23)) + theme(axis.title.y = element_blank()) 
+
+ggpubr::ggarrange(fri_n_c,sat_n_c,sun_v_c, nrow = 3)
+```
+
+
+```{r stay length}
+park_movement_Fri_sl <- park_movement_Fri%>% group_by(Timestamp) %>% mutate(n=1, count=sum(n)) %>%
+  distinct(Timestamp,.keep_all=T) %>%
+  group_by(id) %>% mutate(stay_length = sum(n)) %>%
+  arrange(desc(stay_length)) %>%  select(Timestamp, id, stay_length, X,Y)
+
+park_movement_Sat_sl <- park_movement_Sat%>% group_by(Timestamp) %>% mutate(n=1, count=sum(n)) %>%
+  distinct(Timestamp,.keep_all=T) %>%
+  group_by(id) %>% mutate(stay_length = sum(n)) %>%
+  arrange(desc(stay_length))  %>%  select(Timestamp, id, stay_length, X,Y)
+
+park_movement_Sun_sl <- park_movement_Sun%>% group_by(Timestamp) %>% mutate(n=1, count=sum(n)) %>%
+  distinct(Timestamp,.keep_all=T) %>%
+  group_by(id) %>% mutate(stay_length = sum(n)) %>%
+  arrange(desc(stay_length))  %>% select(Timestamp, id, stay_length, X,Y)
+
+park_movement_Fri_id <- park_movement_Fri_sl %>% distinct(id,.keep_all=T) %>% 
+  select(id, stay_length)
+
+park_movement_Sat_id <- park_movement_Sat_sl %>% distinct(id,.keep_all=T) %>% 
+  select(id, stay_length)
+
+park_movement_Sun_id <- park_movement_Sun_sl %>% distinct(id,.keep_all=T) %>% 
+  select(id, stay_length)
+
+sus_id_sl <- park_movement_Fri_id%>%
+  full_join(park_movement_Sat_id) %>%
+  full_join(park_movement_Sun_id) %>%
+  mutate(n=1) %>% group_by(id) %>% 
+  mutate(many_visits=sum(n), total_stay_length = sum(stay_length)) %>%
+  arrange(desc(total_stay_length)) %>% filter(many_visits>=2) %>% distinct(id, .keep_all =T) %>%
+  select(id, many_visits, total_stay_length)
+
+# write_csv(movement_id_sl, "sus-id.csv")
+
+# ggplot(data = park_movement_Fri_id, aes(x=Timestamp, y=count)) + geom_line()
+```
+
+```{r}
+id_list <- as.vector(unlist(sus_id_sl[c(1:50),1]))
+```
+
+## Movement Map for IDs
+
+### Friday
+
+```{r}
+sus_movement_fri <- park_movement_Fri%>%
+  filter(id %in% id_list) 
+
+g1 <- ggplot(data=sus_movement_fri, aes(x=X, y=Y, color=as.character(id))) +geom_point(alpha=0.3)
+g1
+# ggplotly(g1)
+
+```
+
+### Saturday
+
+```{r}
+sus_movement_sat <- park_movement_Sat %>%
+  filter(id %in% id_list) #, Timestamp >= "") 
+
+g3 <- ggplot(data=sus_movement_sat, aes(x=X, y=Y, color=as.character(id))) +geom_point(alpha=0.3)
+g3
+```
+
+### Sunday
+
+```{r}
+sus_movement_sun <- park_movement_Sun %>%
+  filter(id %in% id_list)
+
+g5 <- ggplot(data=sus_movement_sun, aes(x=X, y=Y, color=as.character(id))) +geom_point(alpha=0.3)
+g5
+```
+
+
+## Further narrow by location
+
+```{r}
+id_close_fri <- park_movement_Fri%>%
+  filter(X==32&Y==33& type=="check-in") %>% distinct(id) %>% select(id) %>% mutate(day = "Fri")
+
+id_close_sat <- park_movement_Sat%>%
+  filter(X==32&Y==33& type=="check-in") %>% distinct(id) %>% select(id) %>% mutate(day = "Sat")
+
+id_close_sun <- park_movement_Sun%>%
+  filter(X==32&Y==33& type=="check-in") %>% distinct(id) %>% select(id) %>% mutate(day = "Sun")
+
+id_close <- id_close_fri%>% 
+  full_join(id_close_sat) %>% full_join(id_close_sun) %>% 
+  mutate(n=1) %>% group_by(id) %>% mutate(times = sum(n)) %>% distinct()  %>%
+  filter(times==3) %>% select (id, times)
+
+write_csv(id_close, "id_close")  #5,439 rows --> 2,457 r (both check in and movement) --> 480 (checkin only)
+```
+
+### Location + stay length
+
+```{r}
+id_sus <- id_close %>%
+  full_join(sus_id_sl) %>% na.omit() %>% distinct(id, .keep_all=T) #153 rows --> 15 checkin
+id_sus_15 <- as.vector(unlist(id_sus[,1]))
+```
+
+
+## Communication Data
+
+```{r}
+comm_data_Fri <- read_csv("Communication Data/comm-data-Fri.csv", 
+                          col_types = cols(Timestamp = col_datetime(format = "%Y-%m-%d %H:%M:%S\t"),
+                                           from = col_character()))
+comm_data_Sat <- read_csv("Communication Data/comm-data-Sat.csv", 
+                          col_types = cols(Timestamp = col_datetime(format = "%Y-%m-%d %H:%M:%S\t"),
+                                           from = col_character()))
+comm_data_Sun <- read_csv("Communication Data/comm-data-Sun.csv", 
+                          col_types = cols(Timestamp = col_datetime(format = "%Y-%m-%d %H:%M:%S\t"),
+                                           from = col_character()))
+```
+
+### Filter by movement + staylength id list
+
+```{r}
+id_sus <- as.vector(unlist(sus_id_sl[,1]))
+  
+comm_data_Fri_f <- comm_data_Fri%>%
+  filter(from %in% id_sus|to %in% id_sus) %>%
+  group_by(Timestamp)%>%
+  mutate(m=1, n = sum(m))
+comm_data_Sat_f <- comm_data_Sat%>%
+  filter(from %in% id_sus|to %in% id_sus)%>%
+  group_by(Timestamp)%>%
+  mutate(m=1, n = sum(m))
+comm_data_Sun_f <- comm_data_Sun%>%
+  filter(from %in% id_sus|to %in% id_sus)%>%
+  group_by(Timestamp)%>%
+  mutate(m=1, n = sum(m))
+```
+
+```{r}
+## Friday
+ggplot(data = comm_data_Fri_f, aes(x=Timestamp, y = n, color = from)) + geom_point(alpha=0.2) + 
+  labs(x="Friday") + theme(legend.position="none")
+## Satday
+ggplot(data = comm_data_Sat_f, aes(x=Timestamp, y = n, color = from)) + geom_point(alpha=0.2) +
+  labs(x="Saturday") + theme(legend.position="none")
+## Sunday
+ggplot(data = comm_data_Sun_f, aes(x=Timestamp, y = n, color = from)) + geom_point(alpha=0.2) + 
+  labs(x="Sunday") + theme(legend.position="none")
+```
+
+
+### Filter by IDs and External numbers
+
+```{r sunday}
+ext_id <- comm_data_Sun %>%
+  filter(to == "external") %>% distinct(from)
+```
+
+
+## Network graph
+
+#### On 15 IDs idetified in terms of staylength and entry into the pavillion all 3 days
+
+```{r}
+# id_sus <- id_sus %>%
+#   full_join(ext_id)
+# morning sunday: until 2014-06-08 13:16:27	
+
+morning_sun_comm <- comm_data_Sun[c(1:527059),]
+netw <- morning_sun_comm%>%
+  filter(from%in%id_sus_15) %>% select(-location) # or to%in%id_sus_15|from%in%id_sus_15
+
+#node list
+sources <- netw %>% distinct(from) %>% rename(id = from) %>% mutate(from = "from")
+destinations <- netw %>% distinct(to) %>% rename(id = to)
+nodes <- full_join(sources, destinations, by = "id") %>% distinct(id,.keep_all=T) %>% 
+  mutate(f = ifelse(from=="from", "from", "to")) %>% select(id,f)
+
+#edge list
+per_route <- netw %>%  
+  group_by(from, to) %>%
+  summarise(weight = n()) %>% 
+  ungroup()
+edges <- per_route %>% 
+  left_join(nodes, by = c("from" = "id"))
+edges <- edges %>% 
+  left_join(nodes, by = c("to" = "id"))
+edges <- select(edges, from, to, weight)
+```
+
+```{r}
+# A tbl_graph consists of two tibbles: an edges tibble and a nodes tibble
+routes_tidy <- tbl_graph(nodes = nodes, edges = edges, directed = TRUE) 
+
+nw <- ggraph(routes_tidy, layout = "auto") + 
+  geom_edge_link(aes(color = weight, width = weight), alpha = 0.7) + 
+  scale_edge_width(range = c(0.2, 2)) +
+  scale_edge_colour_gradient(low = "#f09c9c",
+                             high = "#d60d0d",
+                             space = "Lab") +
+  geom_node_point(aes(colour = ifelse(f=="from" ,"#0f0fa3","#635d5d")), show.legend = FALSE) + theme_graph()+
+  geom_node_text(aes(label = ifelse(f=="from", id, NA)), repel = TRUE) 
+
+nw
+```
+
+## Misc
+
+```{r}
+# until 2014-08-01 13:03:22	
+f <- park_movement_Sun[c(1:4165607),] %>%
+  filter(type=="check-in") %>% group_by(Timestamp) %>%
+  mutate(n=1,count=sum(n)) %>% distinct(Timestamp,.keep_all=T)
+ggplot(data =f, aes(x=Timestamp, y= count)) + geom_line()
+```
+
+```{r}
+s1128580 <- park_movement_Sun[c(1:4165607),]%>%
+  filter(id=="1128580")
+s1128580_n <- park_movement_Sun[c(4165607:10932426),]%>%
+  filter(id=="1128580")
+g3 <- ggplot(data=s1128580, aes(x=X, y=Y, color=Timestamp)) +
+  geom_point(alpha=0.3) +labs (x = NULL, y =NULL, title = "ID 1128580's morning movement") + theme_classic() +
+  theme(legend.position = "none") 
+g4 <- ggplot(data=s1128580_n, aes(x=X, y=Y, color=Timestamp)) +
+  geom_point(alpha=0.3) +labs (x = NULL, y =NULL,title = "ID 1128580's afternoon movement") + theme_classic()+
+  theme(legend.position = "none")
+
+ggpubr::ggarrange(g3,g4, ncol = 2, legend = "bottom")
+```
+

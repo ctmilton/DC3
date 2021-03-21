@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1616344144150.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "1DA6BB54",
+    "lastKnownWriteTime" : 0,
+    "last_content_update" : 1616344144150,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "DB8324B9",
+        "caption" : "Meteorological_Data",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=Meteorological_Data&cache_key=DB8324B9",
+        "displayedObservations" : "707",
+        "environment" : "",
+        "expression" : "Meteorological_Data",
+        "object" : "Meteorological_Data",
+        "preview" : "0",
+        "totalObservations" : "707",
+        "variables" : "4"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

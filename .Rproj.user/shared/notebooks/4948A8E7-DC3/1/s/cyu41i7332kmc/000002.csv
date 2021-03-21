@@ -1,0 +1,5 @@
+"0","traffic_data <- Lekagul_Sensor_Data %>%"
+"0","  mutate(in_out_n = ifelse(str_detect(`gate-name`,""entrance""),1,0)) %>%"
+"0","  group_by(`car-id`) %>%"
+"0","  mutate(in_out_check = sum(in_out_n)) %>% distinct(`car-id`, .keep_all = T) %>%"
+"0","  filter(in_out_check!=2)"
