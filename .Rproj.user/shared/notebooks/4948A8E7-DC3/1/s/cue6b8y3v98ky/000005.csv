@@ -1,0 +1,5 @@
+"0","Meteorological_Data <- read_csv(""Meteorological Data.csv"", 
+    col_types = cols(Date = col_datetime(format = ""%m/%d/%y %h:%M\t""), 
+        X4 = col_skip()))
+"
+"2","Missing column names filled in: 'X4' [4]"
