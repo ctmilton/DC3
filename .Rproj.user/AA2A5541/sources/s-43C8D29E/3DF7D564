@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1616359966661.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "3DF7D564",
+    "lastKnownWriteTime" : 4121991291236346719,
+    "last_content_update" : 1616359966661,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "F3EFA59D",
+        "caption" : "sensor_april",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=sensor_april&cache_key=F3EFA59D",
+        "displayedObservations" : "25848",
+        "environment" : "",
+        "expression" : "sensor_april",
+        "object" : "sensor_april",
+        "preview" : "0",
+        "totalObservations" : "25848",
+        "variables" : "5"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

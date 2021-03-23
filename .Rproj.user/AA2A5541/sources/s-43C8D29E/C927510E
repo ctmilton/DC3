@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1616358335544.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "C927510E",
+    "lastKnownWriteTime" : 4360751059,
+    "last_content_update" : 1616358335544,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "BA571C17",
+        "caption" : "traffic_data",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=traffic_data&cache_key=BA571C17",
+        "displayedObservations" : 1043,
+        "environment" : "",
+        "expression" : "traffic_data",
+        "object" : "traffic_data",
+        "preview" : 0,
+        "totalObservations" : 1043,
+        "variables" : 6
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

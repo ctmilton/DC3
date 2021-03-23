@@ -1,0 +1,5 @@
+"0","windRose(mydata = Meteorological_april, ws = `Wind Speed (m/s)`, wd = `Wind Direction`)
+"
+"2","Error in checkNum(mydata, vars = c(ws, wd)) : 
+  object 'Wind Speed (m/s)' not found
+"

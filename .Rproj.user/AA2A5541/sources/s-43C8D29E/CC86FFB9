@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1616513487663.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "CC86FFB9",
+    "lastKnownWriteTime" : 8246197980183487337,
+    "last_content_update" : 1616513487663,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "78F0F0AD",
+        "caption" : "Meteorological_april",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=Meteorological_april&cache_key=78F0F0AD",
+        "displayedObservations" : 240,
+        "environment" : "",
+        "expression" : "Meteorological_april",
+        "object" : "Meteorological_april",
+        "preview" : 0,
+        "totalObservations" : 240,
+        "variables" : 5
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

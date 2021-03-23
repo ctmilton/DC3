@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1616358344042.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "F03D30E7",
+    "lastKnownWriteTime" : 140404275736480,
+    "last_content_update" : 1616358344042,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "1961EC86",
+        "caption" : "Lekagul_Sensor_Data",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=Lekagul_Sensor_Data&cache_key=1961EC86",
+        "displayedObservations" : 171477,
+        "environment" : "",
+        "expression" : "Lekagul_Sensor_Data",
+        "object" : "Lekagul_Sensor_Data",
+        "preview" : 0,
+        "totalObservations" : 171477,
+        "variables" : 4
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

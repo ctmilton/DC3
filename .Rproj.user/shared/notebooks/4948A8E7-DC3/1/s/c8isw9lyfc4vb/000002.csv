@@ -1,0 +1,7 @@
+"0","Lekagul_Sensor_Data <- read_csv(""Lekagul Sensor Data.csv"", "
+"0","    col_types = cols(Timestamp = col_datetime(format = ""%m/%d/%y %h:%M\t"")))"
+"0","Meteorological_Data <- read_csv(""Meteorological Data.csv"", "
+"0","    col_types = cols(Date = col_datetime(format = ""%m/%d/%y %h:%M\t""), "
+"0","        X4 = col_skip()))"
+"0","Sensor_Data <- read_csv(""Sensor Data.csv"", "
+"0","    col_types = cols(`Date Time` = col_datetime(format = ""%m/%d/%y %h:%M\t"")))"

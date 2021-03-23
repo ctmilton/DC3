@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1616298728251.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "0|3|12|0|\n14|27|20|0|\n24|6|32|0|\n48|21|105|0|\n50|6|63|0|\n65|18|84|0|\n67|6|82|0|\n85|14|105|0|\n87|6|102|0|\n106|13|136|0|\n108|6|132|0|\n137|6|297|0|\n139|6|145|0|\n147|6|289|0|\n163|33|278|0|\n176|23|181|0|\n182|35|239|0|\n240|26|253|0|\n254|20|277|20|\n291|6|295|0|\n",
+    "hash" : "0",
+    "id" : "8BFD4CE0",
+    "lastKnownWriteTime" : 1616521467,
+    "last_content_update" : 1616521987591,
+    "path" : "~/Documents/DC/DC3-data/git/DC3/DC3.Rmd",
+    "project_path" : "DC3.Rmd",
+    "properties" : {
+        "cursorPosition" : "44,29",
+        "last_setup_crc32" : "43C8D29Ed8ac4175",
+        "scrollLine" : "42"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}
