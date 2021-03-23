@@ -321,3 +321,150 @@ leaflet(data = df,
       }
       ",.open = '<', .close = '>')) %>% 
   addMarkers(~y, ~x)
+  
+  
+  
+#Sensor and Meteorological Data
+```{r}
+library(tidyverse)
+library(ggplot2)
+```
+
+
+```{r} 
+#Reading the csv files
+met_data <- read.csv("Meteorological Data.csv")
+met_data <- met_data %>% select(-"X")
+sensor_data <- read.csv("Sensor Data.csv")
+```
+
+
+```{r}
+glimpse(met_data)
+```
+
+```{r}
+#Hmm let's see if anything happens when we plot date and winds
+
+#darn but to do that I need to pivot longer 
+
+met_data_piv <- met_data %>% pivot_longer(c(Wind.Direction, Wind.Speed..m.s.), names_to = "type", values_to = "value")
+
+p_date_winds <- met_data_piv %>% ggplot(aes(x = Date, y = value)) +
+  geom_point() +
+  facet_wrap(~type)
+
+p_date_winds
+```
+
+```{r}
+#Okay so that didn't work super well bc they have different scales/units, so even with a facet wrap the wind speed is pushed down to like the bottom of the graph
+
+p_date_speed <- met_data %>% 
+  ggplot(aes(x = Date, y = Wind.Speed..m.s.)) +
+  geom_point()
+
+p_date_speed
+```
+
+```{r}
+#The eventual goal is to create a wind direction map
+#the first step is to make sure I can plot wind direction vs total speed
+
+met_data %>% 
+  group_by(Wind.Direction) %>% 
+  mutate(sum_wind_speed = sum(Wind.Speed..m.s.)) %>%
+  ggplot(aes(x = Wind.Direction, y = Wind.Speed..m.s.)) +
+  geom_line()
+```
+
+
+```{r}
+#In order to map polylines I need to convert each of these wind directions on a 360 degree circle to approximate coordinates on a grid -- in this case, an X-Y grid beginning at (0,0) in the bottom left and going to (200,200) on top right
+
+#I've made a scale
+degrees <- c(0, 45, 90, 135, 180, 225, 270, 315, 360)
+x_coord <- c(100, 150, 200, 150, 100, 50, 0, 50, 100)
+y_coord <- c(200, 150, 100, 50, 0, 50, 100, 150, 200)
+
+df_scale <- data.frame(degrees, x_coord, y_coord)
+glimpse(df_scale)
+```
+
+```{r}
+#making sure the scale works
+ggplot(data = df_scale, aes(x = degrees, y = x_coord)) +
+  geom_point()
+ggplot(data = df_scale, aes(x = degrees, y = y_coord)) +
+  geom_point()
+```
+
+```{r}
+#let's say we're trying to find x_coord from degrees
+#from 0 to 90 degrees
+x_from_degrees_to_90 <- data.frame("degrees" = c(0, 45, 90), "x" = c(100, 150, 200))
+
+#now x from 90 to 270 degrees
+x_90_to_270 <- data.frame("degrees" = c(90, 135, 180, 225, 270), "x" = c(200, 150, 100, 50, 0))
+
+#and x from 270 to 360
+x_270_to_360 <- data.frame("degrees" = c(270, 315, 360), "x" = c(0, 50, 100))
+
+x1m <- lm(x~degrees, data=x_from_degrees_to_90)
+x2m <- lm(x~degrees, data = x_90_to_270)
+x3m <- lm(x~degrees, data = x_270_to_360)
+summary(x3m)
+x3m
+```
+
+```{r}
+#let's say we're trying to find y_coord from degrees
+#from 0 to 180 degrees
+y1 <- data.frame("degrees" = c(0, 45, 90, 135, 180), "y" = c(200, 150, 100, 50, 0))
+
+#now x from 180 to 360 degrees
+y2 <- data.frame("degrees" = c(180, 225, 270, 315, 360), "y" = c(0, 50, 100, 150, 200))
+
+y1m <- lm(y~degrees, data=y1)
+y2m <- lm(y~degrees, data = y2)
+summary(y2m)
+y2m
+```
+
+```{r}
+#brilliant! now i just have to change the values in the data frame for the wind
+
+#how tf to do that
+
+degrees_df = data.frame("deg" = c(0, 45, 90, 135, 180, 225, 270, 315, 360))
+degrees_df <- degrees_df %>% 
+  mutate(x = ifelse(deg <= 90, (1 + (1/9))*deg + 100, ifelse(deg <= 270, -(1 + (1/9))*deg + 300, (1 + (1/9))*deg - 300)))
+#awesome!!!
+
+
+met_data_coords <- met_data %>%
+  mutate(x = ifelse(Wind.Direction <= 90, (1 + (1/9))*Wind.Direction + 100, ifelse(Wind.Direction <= 270, -(1 + (1/9))*Wind.Direction + 300, (1 + (1/9))*Wind.Direction - 300)),
+         y = ifelse(Wind.Direction <= 180, -(1 + (1/9))*Wind.Direction + 200, (1 + (1/9))*Wind.Direction - 200),
+         xstart = 100,
+         ystart=100) %>% 
+  group_by(Wind.Direction) %>% 
+  mutate(direction = Wind.Direction,
+         total_speed = sum(Wind.Speed..m.s.))
+
+glimpse(met_data_coords)
+```
+
+```{r}
+met_data_coords %>% 
+  ggplot(aes(x = xstart, y = ystart, xend = x, yend = y, color = Wind.Speed..m.s.)) +
+  geom_segment() +
+labs(title = "Wind Directions and Speed", subtitle = "Wind traveling from margins of map to center", y = "", x = "")
+```
+
+```{r}
+met_data_coords %>% 
+  ggplot(aes(x = x, y = y, color = Wind.Speed..m.s.)) +
+  geom_point()
+```
+
+
