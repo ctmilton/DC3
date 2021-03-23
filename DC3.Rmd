@@ -295,3 +295,29 @@ p3
 # windRose(mydata = Meteorological_april, ws = Meteorological_april$`Wind Speed (m/s)`, wd = Meteorological_april$`Wind Direction`)
 ```
 
+
+# The code below is from Sophie Li
+df <- data.frame(name = c("foo", "bar", "baz"),
+                 x = c(100, 150, 150),
+                 y = c(100, 100, 150))
+
+# minimal custom image
+imageURL <- 'https://leafletjs.com/examples/crs-simple/uqm_map_400px.png'
+
+# get image data. we'll use this to set the image size
+imageData <- 
+    image_read(imageURL) %>% image_info()
+leaflet(data = df,
+        height=400,
+        width=400,
+        options = leafletOptions(crs = leafletCRS('L.CRS.Simple'))) %>% 
+        setView(200, 200, zoom = -1) %>%
+        onRender(glue::glue("
+      function(el, x) {
+        var myMap = this;
+        var imageUrl = '<imageURL>';
+        var imageBounds = [[<0>,<0>], [<imageData$height>,<imageData$width>]];
+        L.imageOverlay(imageUrl, imageBounds).addTo(myMap);
+      }
+      ",.open = '<', .close = '>')) %>% 
+  addMarkers(~y, ~x)
